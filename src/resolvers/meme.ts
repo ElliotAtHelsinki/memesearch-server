@@ -18,13 +18,14 @@ export class MemeResolver {
     @Arg('limit', () => Int, { nullable: true }) limit: number = 1,
     @Ctx() { weaviate }: Context
   ): Promise<Meme[]> {
-    console.log(await weaviate.collections.listAll())
+    // console.log(await weaviate.collections.listAll())
     const memeCollection = weaviate.collections.get('Meme')
     const searchFileBuffer = Buffer.from(image, 'base64')
     const response = await memeCollection.query.nearImage(searchFileBuffer, {
       limit,
       returnProperties: ['image', 'text']
     })
+    console.log(response.objects.map(o => ({ image: o.properties.image as string, text: o.properties.text as string })))
     return response.objects.map(o => ({ image: o.properties.image as string, text: o.properties.text as string }))
   }
 }
